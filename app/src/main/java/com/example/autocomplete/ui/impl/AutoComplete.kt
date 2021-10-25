@@ -1,6 +1,5 @@
 package com.example.autocomplete.ui.impl
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
@@ -22,7 +21,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun <T> AutoComplete(
     formControl: AutoCompleteFormControl<T>
@@ -31,13 +29,16 @@ fun <T> AutoComplete(
         formControl.dataState
     }
     var filteredData by remember {
-        mutableStateOf(listOf<T>())
+        formControl.filteredValues
     }
     var inputDisplayValue by remember {
         formControl.inputDisplayValue
     }
     var isExpandedDropDown by remember {
         formControl.isExpanded
+    }
+    val isError by remember {
+        mutableStateOf(formControl.errorState)
     }
     val alpha =
         animateFloatAsState(
@@ -54,25 +55,27 @@ fun <T> AutoComplete(
     height = if (isExpandedDropDown) 200.dp else 0.dp
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier.fillMaxWidth()) {
-            OutlinedTextField(
-                value = inputDisplayValue,
-                onValueChange = {
-                    inputDisplayValue = it
-                    isExpandedDropDown = true
-                    filteredData = data.filter { item ->
-                        formControl.display(item)
-                            .lowercase().contains(it.lowercase())
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .onFocusChanged {
-                        isExpandedDropDown = it.isFocused
-                    }
-            )
+            if (formControl.behavior == AutoCompleteBehavior.DEFAULT || formControl.behavior == AutoCompleteBehavior.SOFT_SELECT) {
+                OutlinedTextField(
+                    value = inputDisplayValue,
+                    onValueChange = {
+                        inputDisplayValue = it
+                        isExpandedDropDown = true
+                        filteredData = data.filter { item ->
+                            formControl.display(item)
+                                .lowercase().contains(it.lowercase())
+                        }
+                    },
+                    isError = if (formControl.behavior == AutoCompleteBehavior.SOFT_SELECT) isError.value else false,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .onFocusChanged {
+                            isExpandedDropDown = it.isFocused
+                        }
+                )
+            }
         }
-        Spacer(modifier = Modifier.height(4.dp))
         Box(contentAlignment = Alignment.TopStart, modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)

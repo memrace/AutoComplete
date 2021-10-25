@@ -14,10 +14,17 @@ class AutoCompleteFormControl<T>(
 ) : FormControl<T>(null, validators) {
     internal val isExpanded: MutableState<Boolean> = mutableStateOf(false)
     internal val inputDisplayValue: MutableState<String> = mutableStateOf("")
-
+    internal val filteredValues = mutableStateOf<List<T>>(listOf())
+    internal val errorState = mutableStateOf(false)
     override fun emitValue(value: T?) {
         inputDisplayValue.value = if (value == null) "" else display(value)
         super.emitValue(value)
+    }
+
+    override fun isValid(): Boolean {
+        val isValid = super.isValid()
+        errorState.value = !isValid
+        return isValid
     }
 }
 

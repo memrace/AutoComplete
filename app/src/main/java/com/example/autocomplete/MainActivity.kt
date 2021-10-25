@@ -12,6 +12,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.autocomplete.ui.api.IFormControlValidator
 import com.example.autocomplete.ui.impl.AutoComplete
 import com.example.autocomplete.ui.impl.AutoCompleteBehavior
 import com.example.autocomplete.ui.impl.AutoCompleteFormControl
@@ -20,10 +21,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-data class UserModel(val name: String, val age: Int)
+internal data class UserModel(val name: String, val age: Int)
 
 
-class MainActivity : ComponentActivity() {
+internal class MainActivity : ComponentActivity() {
     private val _viewModel: UserViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,100 +34,8 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MaterialTheme.colors.background) {
                     LazyColumn {
                         item {
-                            val scrollState = rememberLazyListState()
                             AutoComplete(formControl = _viewModel.userFormControl)
                         }
-                        item {
-                            AutoComplete(
-                                formControl = AutoCompleteFormControl(
-                                    mutableStateOf(listOf<UserModel>()),
-                                    { it.name },
-                                    AutoCompleteBehavior.DEFAULT
-                                )
-                            )
-                        }
-                        item {
-                            AutoComplete(
-                                formControl = AutoCompleteFormControl(
-                                    mutableStateOf(listOf<UserModel>()),
-                                    { it.name },
-                                    AutoCompleteBehavior.DEFAULT
-                                )
-                            )
-                        }
-                        item {
-                            AutoComplete(
-                                formControl = AutoCompleteFormControl(
-                                    mutableStateOf(listOf<UserModel>()),
-                                    { it.name },
-                                    AutoCompleteBehavior.DEFAULT
-                                )
-                            )
-                        }
-                        item {
-                            AutoComplete(
-                                formControl = AutoCompleteFormControl(
-                                    mutableStateOf(listOf<UserModel>()),
-                                    { it.name },
-                                    AutoCompleteBehavior.DEFAULT
-                                )
-                            )
-                        }
-                        item {
-                            AutoComplete(
-                                formControl = AutoCompleteFormControl(
-                                    mutableStateOf(listOf<UserModel>()),
-                                    { it.name },
-                                    AutoCompleteBehavior.DEFAULT
-                                )
-                            )
-                        }
-                        item {
-                            AutoComplete(
-                                formControl = AutoCompleteFormControl(
-                                    mutableStateOf(listOf<UserModel>()),
-                                    { it.name },
-                                    AutoCompleteBehavior.DEFAULT
-                                )
-                            )
-                        }
-                        item {
-                            AutoComplete(
-                                formControl = AutoCompleteFormControl(
-                                    mutableStateOf(listOf<UserModel>()),
-                                    { it.name },
-                                    AutoCompleteBehavior.DEFAULT
-                                )
-                            )
-                        }
-                        item {
-                            AutoComplete(
-                                formControl = AutoCompleteFormControl(
-                                    mutableStateOf(listOf<UserModel>()),
-                                    { it.name },
-                                    AutoCompleteBehavior.DEFAULT
-                                )
-                            )
-                        }
-                        item {
-                            AutoComplete(
-                                formControl = AutoCompleteFormControl(
-                                    mutableStateOf(listOf<UserModel>()),
-                                    { it.name },
-                                    AutoCompleteBehavior.DEFAULT
-                                )
-                            )
-                        }
-                        item {
-                            AutoComplete(
-                                formControl = AutoCompleteFormControl(
-                                    mutableStateOf(listOf<UserModel>()),
-                                    { it.name },
-                                    AutoCompleteBehavior.DEFAULT
-                                )
-                            )
-                        }
-
                     }
                 }
             }
@@ -135,12 +44,18 @@ class MainActivity : ComponentActivity() {
 }
 
 
-class UserViewModel : ViewModel() {
+internal class UserViewModel : ViewModel() {
     private val _userState: MutableState<List<UserModel>> = mutableStateOf(listOf())
     val userFormControl = AutoCompleteFormControl(
         dataState = _userState,
         display = { it.name },
-        behavior = AutoCompleteBehavior.DEFAULT
+        behavior = AutoCompleteBehavior.DEFAULT,
+        validators = listOf(object : IFormControlValidator<UserModel> {
+            override fun validate(value: UserModel?): Boolean {
+                return false
+            }
+
+        })
     )
 
     fun loadUsers() {
